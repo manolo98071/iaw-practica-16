@@ -1,0 +1,66 @@
+version: '3.3'
+
+services:
+  apache:
+    image:
+      build: ./apache
+      ports:
+        - 80:80 
+      restart: always
+      networks:
+        - frontend_network:
+        - backend_network:
+      depends_on:
+        - mysql
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend_network
+    security_opt:
+      - seccomp:unconfined
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=mysql
+    depends_on:
+      - mysql
+    networks:
+      - frontend_network
+
+# https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      #DOMAINS: 'localhost -> http://prestashop:80 #local'
+      DOMAINS: 'iawprestashop.ddns.net  -> http://prestashop:8080 #production'
+    volumes:
+      - ssl_certs_data:/var/lib/https-portal
+    depends_on:
+      - prestashop
+    restart: always
+    networks:
+      - frontend_network
+
+volumes:
+  prestashop_data:
+  mariadb_data:
+  ssl_certs_data:
+
+networks:
+  frontend_network:
+  backend_network:
