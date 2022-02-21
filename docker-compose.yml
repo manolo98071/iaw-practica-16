@@ -12,6 +12,8 @@ services:
         - backend_network:
       depends_on:
         - mysql
+      volumes:
+        - ./iaw-practica-lamp/src:/var/www/html	
 
   mysql:
     image: mysql:8.0
@@ -23,6 +25,7 @@ services:
     restart: always
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./iaw-practica-lamp/db:/docker-entrypoint-initdb.d
     networks:
       - backend_network
     security_opt:
@@ -40,26 +43,8 @@ services:
     networks:
       - frontend_network
 
-# https-portal:
-    image: steveltn/https-portal:1
-    ports:
-      - 80:80
-      - 443:443
-    environment:
-      #DOMAINS: 'localhost -> http://prestashop:80 #local'
-      DOMAINS: 'iawprestashop.ddns.net  -> http://prestashop:8080 #production'
-    volumes:
-      - ssl_certs_data:/var/lib/https-portal
-    depends_on:
-      - prestashop
-    restart: always
-    networks:
-      - frontend_network
-
 volumes:
-  prestashop_data:
-  mariadb_data:
-  ssl_certs_data:
+  mysql_data:
 
 networks:
   frontend_network:
