@@ -2,26 +2,25 @@ version: '3.3'
 
 services:
   apache:
-    image:
-      build: ./apache
-      ports:
-        - 80:80 
-      restart: always
-      networks:
-        - frontend_network:
-        - backend_network:
-      depends_on:
-        - mysql
-      volumes:
-        - ./iaw-practica-lamp/src:/var/www/html	
+    build: ./apache
+    ports:
+      - 80:80 
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+      - ./iaw-practica-lamp/src:/var/www/html
+    networks:
+      - frontend_network
+      - backend_network
 
   mysql:
     image: mysql:8.0
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=lamp_db
+      - MYSQL_USER=lamp_user
+      - MYSQL_PASSWORD=lamp_password
     restart: always
     volumes:
       - mysql_data:/var/lib/mysql
